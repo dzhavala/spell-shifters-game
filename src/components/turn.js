@@ -10,7 +10,7 @@ import TurnPhaseRuneUsed from './turnPhaseRuneUsed';
 export default function Turn({turnRecord}) {
   // console.log(turnRecord);
   if (!turnRecord.monster) {
-    return <div className="turn">
+    return <div className={`turn ${turnRecord.biome.name}`}>
       <div className="treasure">
         {turnRecord.findShiftScroll && <span className="shiftSpell">Shift spell scroll <br/><b>{turnRecord.heroStatus.shiftSpellScrollsLeft}</b></span>}
         {turnRecord.findHealPotion && <span className="healPotion">Heal potion<br/><b>{turnRecord.heroStatus.healPotionsLeft}</b></span>}
@@ -19,7 +19,7 @@ export default function Turn({turnRecord}) {
     </div>
   }
   return (
-    <div className={`turn ${turnRecord.isSuccess ? 'isSuccess' : 'isFailure'}`}>
+    <div className={`turn ${turnRecord.isSuccess ? 'isSuccess' : 'isFailure'} ${turnRecord.biome.name}`}>
       <div className="turnDescription">
         <TurnHero hero={turnRecord.hero} heroStatus={turnRecord.phases[0].heroStatus} />
         vs

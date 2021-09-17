@@ -32,7 +32,7 @@ export const biome3 = new Biome("Forest", G, math.matrix([
   [G,G,G,G,G,G,B],
 ]));
 
-export const biome4 = new Biome("Fire land", R, math.matrix([
+export const biome4 = new Biome("Fireland", R, math.matrix([
   [R,Y,Y,Y,Y,Y,Y],
   [R,R,Y,Y,Y,Y,B],
   [R,R,R,Y,Y,B,B],

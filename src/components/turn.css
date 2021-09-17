@@ -38,7 +38,7 @@
 
 .turn {
   margin: 0 0 10px;
-  padding: 5px 10px 10px;
+  padding: 5px 15px 10px;
   outline: #ccc solid 1px;
   outline-offset: -1px;
 }
@@ -50,6 +50,19 @@
 .turn.isFailure {
   outline: var(--color-r) solid 1px;
   outline-offset: -1px;
+}
+
+.turn.Desert {
+  box-shadow: var(--color-y)  0 0 250px -200px inset;
+}
+.turn.River {
+  box-shadow: var(--color-b)  0 0 250px -200px inset;
+}
+.turn.Forest {
+  box-shadow: var(--color-g)  0 0 250px -200px inset;
+}
+.turn.Fireland {
+  box-shadow: var(--color-r)  0 0 250px -200px inset;
 }
 
 .turn .treasure {
