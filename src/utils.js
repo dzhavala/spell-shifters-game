@@ -287,7 +287,7 @@ export const getMonsterTrophiesCountOutsiderHero = (heroesArray) => {
 }
 
 export const getMonsterTrophiesCountLeaderHero = (heroesArray) => {
-  let leader = heroesArray[0];
+  let leader = heroesArray[heroesArray.length - 1];
   heroesArray.forEach(hero => {
     if (hero !== leader && hero.getMonsterTrophiesCount() > leader.getMonsterTrophiesCount()) {
       leader = hero;

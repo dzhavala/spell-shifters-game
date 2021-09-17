@@ -4,7 +4,7 @@
   --color-g: #8ac926;
   --color-r: #ff595e;
 
-  --turn-height: 230px;
+  --turn-height: 500px;
 }
 
 .heroesRecords {
@@ -29,6 +29,11 @@
 
 .heroRecords .turn {
   min-height: var(--turn-height);
+  box-sizing: border-box;
+}
+
+.heroRecords .doubleTurn .turn {
+  min-height: calc(var(--turn-height)/2 - 5px);
 }
 
 .turn {
@@ -49,10 +54,16 @@
 
 .turn .treasure {
   display: flex;
-  min-height: var(--turn-height);
+  min-height: calc(var(--turn-height) - 15px);
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
 }
+
+.doubleTurn .turn .treasure {
+  min-height: calc(var(--turn-height)/2 - 20px);
+}
+
 .turn .treasure .shiftSpell {
     height: 100px;
     width: 70px;

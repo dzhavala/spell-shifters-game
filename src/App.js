@@ -44,17 +44,15 @@ const attackMonster = ({hero, monster, biome, turnRecord}) => {
 }
 
 
-const heroTurn = ({hero, monster, biome}) => {
+const heroTurn = ({hero, biome}) => {
   const turnRecord = {
     key: Math.random(),
     hero,
-    // monster,
     biome,
     phases: [],
   };
 
   const possibleEncounters = [MONSTER, SHIFT_SCROLL, HEAL_POTION, RUNE];
-  // const currentEncounter = possibleEncounters[Math.floor(Math.random() * possibleEncounters.length)];
   const currentEncounter = possibleEncounters[randomWeighted({0: .6, 1: .2, 2: .1, 3: .1})];
 
   if(currentEncounter === MONSTER) {
@@ -72,8 +70,10 @@ const heroTurn = ({hero, monster, biome}) => {
     hero.addRune();
   }
 
-  turnRecords.push({...turnRecord, heroStatus: getCurrenHeroStatus(hero)});
-  // console.log({turnRecord});
+  return {
+    ...turnRecord,
+    heroStatus: getCurrenHeroStatus(hero)
+  };
 }
 
 
@@ -130,9 +130,13 @@ const heroTurn = ({hero, monster, biome}) => {
 
       if(hero === outsiderHero) {
         currentBiome = randomBiome;
-        heroTurn({hero, biome: currentBiome});
+        turnRecords.push([
+          heroTurn({hero, biome: currentBiome}),
+          heroTurn({hero, biome: currentBiome})
+        ]);
+      } else {
+        turnRecords.push(heroTurn({hero, biome: currentBiome}))
       }
-      heroTurn({hero, biome: currentBiome});
     })
   }
 
@@ -145,10 +149,11 @@ const heroTurn = ({hero, monster, biome}) => {
   // });
 
   const turnRecordsByHero = turnRecords.reduce((acc, turn) => {
-    if (!acc[turn.hero.name]) {
-      acc[turn.hero.name] = [];
+    const { name } = turn.hero || turn[0].hero;
+    if (!acc[name]) {
+      acc[name] = [];
     }
-    acc[turn.hero.name].push(turn);
+    acc[name].push(turn);
     return acc;
   }, {});
 
@@ -160,7 +165,7 @@ function App() {
       <h2>The Spells shifters game</h2>
       <div className="heroesRecords final">
         {Object.entries(turnRecordsByHero).map(([key, value]) => <div className="heroRecords" key={key}>
-          <TurnHero hero={value[0].hero} />
+          <TurnHero hero={value[0].hero || value[0][0].hero} />
         </div>)}
       </div>
         <hr />
@@ -168,8 +173,14 @@ function App() {
       <div className="heroesRecords">
         {Object.entries(turnRecordsByHero).map(([key, value]) => <div className="heroRecords" key={key}>
           <h3>{key}</h3>
-          {value.map(turnRecord => {
-            return <Turn key={turnRecord.key} turnRecord={turnRecord} />
+          {value.map((turnRecord, index ) => {
+            return Array.isArray(turnRecord)
+              ? <div className="doubleTurn" key={index}>
+                  {turnRecord.map(turnRecordInner => {
+                    return <Turn key={turnRecordInner.key} turnRecord={turnRecordInner} />
+                  })}
+                </div>
+              : <Turn key={turnRecord.key} turnRecord={turnRecord} />
           })}
         </div>)}
       </div>
