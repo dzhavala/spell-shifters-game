@@ -1,5 +1,7 @@
 import * as math from 'mathjs';
 import { Y, B, G, R } from './const';
+import { SHIFT_SCROLL, HEAL_POTION, RUNE, MONSTER } from './const';
+import { monstersArray } from './monsters';
 
 export const randomWeighted = prob => {
   let i, sum=0, r=Math.random();
@@ -171,6 +173,7 @@ export const getSpellsNotReachedLimitInCurrentTest = (heroSpells, monsterSpellsO
     if (heroSpellCount > monsterSpellCount && !result.includes(spell)) {
       result.push(spell);
     }
+    return result;
   });
   return result;
 }
@@ -298,4 +301,68 @@ export const getMonsterTrophiesCountLeaderHero = (heroesArray) => {
 
 export const getMonsterTrophiesCountHeroesDiff = (leader, outsider) => {
   return leader.getMonsterTrophiesCount() - outsider.getMonsterTrophiesCount();
+}
+
+export const attackMonster = ({hero, monster, biome, turnRecord}) => {
+  let currentMonster = monster;
+  let fightResult = fightWithMonster({ hero, monster, biome });
+  turnRecord.phases.push(fightResult);
+
+  if (!fightResult.isSuccess && hero.shiftSpellScrolls) {
+    fightResult = fightWithMonsterUsingSpellsTestAllDirections({ hero, monster: currentMonster, biome, prevFightResult: fightResult });
+    currentMonster = getMonsterWithShiftedMatrix(currentMonster, fightResult.shiftSpell);
+    turnRecord.phases.push(fightResult);
+    if (!fightResult.isSuccess && fightResult.shiftSpell && hero.shiftSpellScrolls &&!!randomWeighted({0: .4, 1: .6})) {
+      fightResult = fightWithMonsterUsingSpellsTestAllDirections({ hero, monster: currentMonster, biome, prevFightResult: fightResult });
+      currentMonster = getMonsterWithShiftedMatrix(currentMonster, fightResult.shiftSpell);
+      turnRecord.phases.push(fightResult);
+    }
+  }
+
+  if (!fightResult.isSuccess && hero.runes >= getFailedSpellsCount(fightResult)) {
+    // console.log({hero});
+    fightResult = fightWithMonsterUsingRunes({ hero, monster: currentMonster, biome, prevFightResult: fightResult });
+    // console.log({fightResult});
+    turnRecord.phases.push(fightResult);
+  }
+
+  turnRecord.isSuccess = fightResult.isSuccess;
+  if (fightResult.isSuccess) {
+    hero.addMonsterTrophy(monster);
+  } else {
+    hero.hit();
+  }
+}
+
+
+export const heroTurn = ({hero, biome}) => {
+  const turnRecord = {
+    key: Math.random(),
+    hero,
+    biome,
+    phases: [],
+  };
+
+  const possibleEncounters = [MONSTER, SHIFT_SCROLL, HEAL_POTION, RUNE];
+  const currentEncounter = possibleEncounters[randomWeighted({0: .6, 1: .2, 2: .1, 3: .1})];
+
+  if(currentEncounter === MONSTER) {
+    const monster = monstersArray[Math.floor(Math.random() * monstersArray.length)];
+    turnRecord.monster = monster;
+    attackMonster({hero, monster, biome, turnRecord});
+  } else if (currentEncounter === SHIFT_SCROLL) {
+    turnRecord.findShiftScroll = true;
+    hero.addShiftSpellScroll();
+  } else if (currentEncounter === HEAL_POTION) {
+    turnRecord.findHealPotion = true;
+    hero.addHealPotion();
+  } else if (currentEncounter === RUNE) {
+    turnRecord.findRune = true;
+    hero.addRune();
+  }
+
+  return {
+    ...turnRecord,
+    heroStatus: getCurrenHeroStatus(hero)
+  };
 }

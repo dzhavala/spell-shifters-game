@@ -5,7 +5,7 @@ import Monster from './classes/monster';
 export const monster1 = new Monster("Flower bird", math.matrix([
   [0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0],
-  [0,0,1,1,1,0,0],
+  [0,0,0,1,1,1,0],
   [0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0],
