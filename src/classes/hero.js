@@ -32,8 +32,8 @@ export default class Hero {
     this.shiftSpellScrolls && this.shiftSpellScrolls--;
   }
 
-  addShiftSpellScroll() {
-    this.shiftSpellScrolls++;
+  addShiftSpellScroll(num = 1) {
+    this.shiftSpellScrolls += num;
   }
 
   addHealPotion() {

@@ -243,3 +243,28 @@
   font-size: 10px;
   margin-right: 5px;
 }
+
+
+/* Monsters test */
+.monstersRecords {}
+.monsterRecords {
+  margin-bottom: 40px;
+}
+.monsterRecords > h3 {
+  text-align: center;
+}
+
+.biomeRecords {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.biomeRecords h4 {
+  flex: 0 0 80px;
+}
+
+.biomeRecords .turn {
+  width: 25%;
+  margin: 0 3px;
+  outline-width: 2px;
+}

@@ -233,45 +233,53 @@ export const fightWithMonsterUsingRunes = ({ hero, monster, biome, prevFightResu
   return prevFightResult;
 }
 
-export const fightWithMonsterUsingSpells = ({ hero, monster, biome, shiftSpell }) => {
+export const fightWithMonsterUsingSpells = ({ hero, monster, biome, shiftSpell, isTestCheck }) => {
+  if (!isTestCheck) {
+    hero.useShiftSpellScroll();
+  }
   let fightResult = fightWithMonster({ hero, monster, biome, shiftSpell });
   return {...fightResult, shiftSpellWasUsed: true };
 }
 
+export const fightWithMonsterUsingSpellsChooseDirection = ({ hero, monster, biome, prevFightResult }) => {
+  const checkAllSpellShiftDirections = randomWeighted({0: .5, 1: .5});
+  if (checkAllSpellShiftDirections) {
+    return fightWithMonsterUsingSpellsTestAllDirections({ hero, monster, biome, prevFightResult })
+  } else {
+    return fightWithMonsterUsingSpellsTestOptimalDirection({ hero, monster, biome, prevFightResult });
+  }
+}
+
 export const fightWithMonsterUsingSpellsTestAllDirections = ({ hero, monster, biome, prevFightResult }) => {
-  let fightResultUsingSpellsInOptimalDirection = fightWithMonsterUsingSpellsTestOptimalDirection({ hero, monster, biome, prevFightResult });
-  let fightResult = fightResultUsingSpellsInOptimalDirection;
   hero.useShiftSpellScroll();
 
-  const checkAllSpellShiftDirections = randomWeighted({0: .5, 1: .5});
+  let fightResult = fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell: [0,1], isTestCheck:true });
 
-  if (checkAllSpellShiftDirections) {
-    fightResult = fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell: [0,1] });
+  if (!fightResult.isSuccess) {
+    fightResult = fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell: [0,-1], isTestCheck:true });
+  }
 
-    if (!fightResult.isSuccess) {
-      fightResult = fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell: [0,-1] });
-    }
+  if (!fightResult.isSuccess) {
+    fightResult = fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell: [1,0], isTestCheck:true });
+  }
 
-    if (!fightResult.isSuccess) {
-      fightResult = fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell: [1,0] });
-    }
+  if (!fightResult.isSuccess) {
+    fightResult = fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell: [-1,0], isTestCheck:true });
+  }
 
-    if (!fightResult.isSuccess) {
-      fightResult = fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell: [-1,0] });
-    }
-
-    // If none of spell directions usage succeed, return the optimal direction's figthResult
-    if (!fightResult.isSuccess) {
-      fightResult = fightResultUsingSpellsInOptimalDirection;
-    }
+  // If none of spell directions usage succeed, return the optimal direction's figthResult
+  // so the upcomind phases may use it as a starting point
+  if (!fightResult.isSuccess) {
+    fightResult = fightWithMonsterUsingSpellsTestOptimalDirection({ hero, monster, biome, prevFightResult, isTestCheck:true });
   }
 
   return fightResult;
 }
 
-export const fightWithMonsterUsingSpellsTestOptimalDirection = ({ hero, monster, biome, prevFightResult }) => {
+export const fightWithMonsterUsingSpellsTestOptimalDirection = ({ hero, monster, biome, prevFightResult, isTestCheck }) => {
+  hero.useShiftSpellScroll();
   const optimalShiftSpellDirection = getOptimalShiftSpellDirection({ prevFightResult, hero });
-  return fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell:optimalShiftSpellDirection });
+  return fightWithMonsterUsingSpells({ hero, monster, biome, shiftSpell:optimalShiftSpellDirection, isTestCheck });
 }
 
 export const getMonsterWithShiftedMatrix = (monster, shiftSpell) => ({
@@ -309,11 +317,11 @@ export const attackMonster = ({hero, monster, biome, turnRecord}) => {
   turnRecord.phases.push(fightResult);
 
   if (!fightResult.isSuccess && hero.shiftSpellScrolls) {
-    fightResult = fightWithMonsterUsingSpellsTestAllDirections({ hero, monster: currentMonster, biome, prevFightResult: fightResult });
+    fightResult = fightWithMonsterUsingSpellsChooseDirection({ hero, monster: currentMonster, biome, prevFightResult: fightResult });
     currentMonster = getMonsterWithShiftedMatrix(currentMonster, fightResult.shiftSpell);
     turnRecord.phases.push(fightResult);
     if (!fightResult.isSuccess && fightResult.shiftSpell && hero.shiftSpellScrolls &&!!randomWeighted({0: .4, 1: .6})) {
-      fightResult = fightWithMonsterUsingSpellsTestAllDirections({ hero, monster: currentMonster, biome, prevFightResult: fightResult });
+      fightResult = fightWithMonsterUsingSpellsChooseDirection({ hero, monster: currentMonster, biome, prevFightResult: fightResult });
       currentMonster = getMonsterWithShiftedMatrix(currentMonster, fightResult.shiftSpell);
       turnRecord.phases.push(fightResult);
     }
@@ -332,6 +340,7 @@ export const attackMonster = ({hero, monster, biome, turnRecord}) => {
   } else {
     hero.hit();
   }
+  return turnRecord;
 }
 
 
