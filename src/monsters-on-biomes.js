@@ -72,7 +72,7 @@ export default function MonstersOnBiomes() {
         <h3>{monsterName}</h3>
         {Object.entries(biomes).map(([biomeName, heroes]) => {
           return <div className="biomeRecords" key={biomeName + monsterName}>
-            <h4>{biomeName}: {heroes.length}</h4>
+            <h4>{biomeName}</h4>
             {heroes.map(turnRecord => <Turn key={turnRecord.key + biomeName + monsterName} turnRecord={turnRecord} />)}
           </div>
         })} 
