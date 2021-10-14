@@ -4,8 +4,8 @@ import { randomInt } from '../utils';
 const MAX_SPELLS = 5;
 const MIN_SPELLS = 4;
 const START_SHIFT_SPELL_SCROLLS = 1;
-const START_HEAL_POTION = 0;
-const START_RUNES = 0;
+const START_HEAL_POTION = 1;
+const START_RUNES = 1;
 
 
 export default class Hero {
@@ -33,7 +33,8 @@ export default class Hero {
   }
 
   addShiftSpellScroll(num = 1) {
-    this.shiftSpellScrolls += num;
+    const newScrolls = Number(num);
+    this.shiftSpellScrolls += newScrolls;
   }
 
   addHealPotion() {

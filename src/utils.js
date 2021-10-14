@@ -190,7 +190,7 @@ export const getOptimalShiftSpellDirection = ({ prevFightResult, hero }) => {
   return getShiftDirectionBySpell(spellToUse);
 }
 
-export const getCurrenHeroStatus = hero => ({
+export const getCurrentHeroStatus = hero => ({
   shiftSpellScrollsLeft: hero.shiftSpellScrolls,
   healPotionsLeft: hero.healPotions,
   spells: hero.getSpells(),
@@ -206,7 +206,7 @@ export const fightWithMonster = ({ hero, monster, biome, shiftSpell, runes }) =>
     monsterSpellsMatrixOnBiome,
     shiftSpell,
     runes,
-    heroStatus: getCurrenHeroStatus(hero),
+    heroStatus: getCurrentHeroStatus(hero),
   }
 }
 
@@ -372,6 +372,6 @@ export const heroTurn = ({hero, biome}) => {
 
   return {
     ...turnRecord,
-    heroStatus: getCurrenHeroStatus(hero)
+    heroStatus: getCurrentHeroStatus(hero)
   };
 }
